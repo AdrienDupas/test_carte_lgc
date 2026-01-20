@@ -249,7 +249,7 @@ function App() {
           .attr('fill', 'none')
           .attr('stroke', showTrumpGolf ? '#DD203C' : '#DD203C')
           .attr('stroke-opacity', showTrumpGolf ? 0.2 : 1)
-          .attr('stroke-width', 1)
+          .attr('stroke-width', 1.5)
           .attr('stroke-dasharray', '5,4')
           .attr('pointer-events', 'none')
       }
@@ -395,10 +395,12 @@ function App() {
           .attr('fill-opacity', 0.6)
           .attr('stroke', '#ba0000')
           .attr('stroke-width', 1.5)
-          .attr('stroke-dasharray', '5,5')
+          .attr('stroke-dasharray', '8 4')
+          .attr('stroke-dashoffset', 0)
           .attr('stroke-linejoin', 'round')
           .attr('stroke-linecap', 'round')
           .attr('pointer-events', 'none')
+          .style('shape-rendering', 'geometricPrecision')
         aireEcoGroup.transition()
           .duration(700)
           .style('opacity', 1)
@@ -948,6 +950,30 @@ function App() {
       <Box ref={containerRef} sx={{ width: '100%', flexGrow: 1, minHeight: 0, position: 'relative' }}>
         <svg ref={svgRef} style={{ width: '100%', height: '100%' }} />
         
+        {/* Source en bas au centre */}
+        {!showStartPrompt && (
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 4,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              color: '#666',
+              fontFamily: '"Publico Text Web Regular", serif',
+              fontSize: { xs: '9px', md: '11px' },
+              zIndex: 1000,
+              fontStyle: 'italic',
+            }}
+          >
+            Source: {!showTechnat 
+              ? 'Ferdinand Fried, Das XX. Jahrhundert, 1940' 
+              : !showTrumpGolf 
+              ? 'Scott Howard, 1940' 
+              : 'Donald Trump, X, 2025-2026'
+            }
+          </Box>
+        )}
+        
         {/* Bouton retour en bas à droite */}
         {!showStartPrompt && (showTechnat || showTrumpGolf) && (
           <Button
@@ -999,7 +1025,7 @@ function App() {
         }} />
       </Box>
       
-      <Box sx={{ width: '100%', minHeight: { xs: '120px', md: '80px' }, flexShrink: 0 }}>
+      <Box sx={{ width: '100%', minHeight: { xs: '135px', md: '80px' }, flexShrink: 0 }}>
         <Legend showTechnat={showTechnat} showTrumpGolf={showTrumpGolf} />
       </Box>
     </Box>
