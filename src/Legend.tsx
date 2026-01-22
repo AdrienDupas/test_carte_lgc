@@ -348,17 +348,10 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
     <Box 
       key="separator-1"
       sx={{ 
-        width: { xs: '1px', md: '1.5px' },
-        height: { xs: '20px', md: '24px' },
-        backgroundColor: '#4b4b4b',
-        flexShrink: 0
-      }}
-    />,
-    <Box 
-      key="break-1"
-      sx={{ 
-        width: { xs: '100%', sm: '100%', md: 0 },
-        height: 0,
+        width: '100%',
+        height: '1px',
+        backgroundColor: '#d0d0d0',
+        my: { xs: 0.5, md: 0.3 },
         flexShrink: 0
       }}
     />,
@@ -455,19 +448,12 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
       key="separator-2"
       sx={{ 
          
-        width: { xs: '1px', md: '1.5px' },
-        height: { xs: '20px', md: '24px' },
-        backgroundColor: '#4b4b4b',
+        width: '100%',
+        height: '1px',
+        backgroundColor: '#d0d0d0',
+        my: { xs: 0.5, md: 0.3 },
         flexShrink: 0
         
-      }}
-    />,
-    <Box 
-      key="break-2"
-      sx={{ 
-        width: { xs: '100%', sm: '100%', md: 0 },
-        height: 0,
-        flexShrink: 0
       }}
     />,
     <Box 
@@ -546,7 +532,8 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
           position: 'absolute',
           display: 'flex',
           alignItems: 'center',
-          gap: { xs: 0.4, md: 2 },
+          rowGap: { xs: 0.4, md: 0.6 },
+          columnGap: { xs: 0.4, md: 2 },
           flexWrap: 'wrap',
           justifyContent: 'flex-start',
           width: 'calc(100% - 32px)',
