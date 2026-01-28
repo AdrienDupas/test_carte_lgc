@@ -152,13 +152,6 @@ function App() {
     }, 1500)
   }, [currentStep, showScrollPrompt, bubbleState])
 
-  // Masquer tous les tooltips lors des changements d'étape
-  useEffect(() => {
-    d3.selectAll('.country-tooltip').style('opacity', 0)
-    d3.selectAll('.military-tooltip').style('opacity', 0)
-    d3.selectAll('.usa-tooltip').style('opacity', 0)
-  }, [currentStep])
-
   useEffect(() => {
     const container = scrollContainerRef.current
     if (!container) return
@@ -236,7 +229,7 @@ function App() {
       // BASE MAP
       // ======================
       const tooltipFontSize = width < 500 ? 10 : width < 900 ? 12 : 16
-      const tooltipCountry = d3.select(document.body)
+      const tooltipCountry = d3.select(container)
         .selectAll('.country-tooltip')
         .data([null])
         .join('div')
@@ -251,7 +244,7 @@ function App() {
         .style('font-family', '"Publico Text Web Regular", serif')
         .style('font-size', tooltipFontSize + 'px')
         .style('box-shadow', '0 2px 8px rgba(0,0,0,0.10)')
-        .style('z-index', 10000)
+        .style('z-index', 3000)
         .style('opacity', 0)
 
       svg.append('g')
@@ -315,69 +308,52 @@ function App() {
       }
 
       // ======================
-      // RÉSEAU BASE (couche visible à l'étape 2 uniquement)
+      // RÉSEAU BASE (couche visible aux étapes 1 et 2)
       // ======================
-      if (showTechnat && !showTrumpGolf && reseauBaseData) {
-        const reseauGroup = svg.append('g')
+      if (!showTrumpGolf && reseauBaseData) {
+        svg.append('g')
           .attr('class', 'reseau-base')
-          .style('opacity', 0)
-        reseauGroup.selectAll('path')
+          .selectAll('path')
           .data(reseauBaseData.features)
           .join('path')
           .attr('d', path as any)
           .attr('fill', 'none')
           .attr('stroke', '#bfbfbf')
-          .attr('stroke-opacity', 1)
+          .attr('stroke-opacity', showTechnat ? 1 : 0.4)
           .attr('stroke-width', 2)
           .attr('pointer-events', 'none')
-        // Animation d'apparition
-        reseauGroup.transition()
-          .duration(600)
-          .style('opacity', 1)
       }
 
       // ======================
-      // FRONTIÈRES TECHNAT (couche visible à l'étape 2 uniquement)
+      // FRONTIÈRES TECHNAT (couche visible aux étapes 1 et 2)
       // ======================
-      if (showTechnat && !showTrumpGolf && frontiereTechnatData) {
-        const frontiereGroup = svg.append('g')
+      if (!showTrumpGolf && frontiereTechnatData) {
+        svg.append('g')
           .attr('class', 'frontieres-technat')
-          .style('opacity', 0)
-        frontiereGroup.selectAll('path')
+          .selectAll('path')
           .data(frontiereTechnatData.features)
           .join('path')
           .attr('d', path as any)
           .attr('fill', 'none')
           .attr('stroke', '#DD203C')
-          .attr('stroke-opacity', 1)
+          .attr('stroke-opacity', showTechnat ? 1 : 0.3)
           .attr('stroke-width', 1.5)
           .attr('stroke-dasharray', '5,4')
           .attr('pointer-events', 'none')
-        // Animation d'apparition
-        frontiereGroup.transition()
-          .delay(200)
-          .duration(600)
-          .style('opacity', 1)
       }
 
       // ======================
-      // TECHNAT (étape 2 uniquement)
+      // TECHNAT (étapes 1 et 2)
       // ======================
-      if (showTechnat && !showTrumpGolf && technatData) {
-        const technatGroup = svg.append('g')
+      if (!showTrumpGolf && technatData) {
+        svg.append('g')
           .attr('class', 'technat')
-          .style('opacity', 0)
-        technatGroup.selectAll('path')
+          .selectAll('path')
           .data(technatData.features)
           .join('path')
           .attr('d', path as any)
           .attr('fill', '#DD203C')
-          .attr('fill-opacity', 0.8)
-        // Animation d'apparition
-        technatGroup.transition()
-          .delay(400)
-          .duration(600)
-          .style('opacity', 1)
+          .attr('fill-opacity', showTechnat ? 0.8 : 0.2)
       }
 
       // ======================
@@ -508,14 +484,32 @@ function App() {
       }
 
       // ======================
-      // BASES MILITAIRES TECHNAT (couche ponctuelle - étape 2 uniquement)
+      // AIRE ECO PALE (uniquement étapes 1 et 2) - Superposition pâle
       // ======================
-      if (showTechnat && !showTrumpGolf && basesMilitaireTechnatData) {
+      if (!showTrumpGolf && aireEcoData) {
+        const aireEcoGroupPale = svg.append('g')
+          .attr('class', 'aire-eco-pale')
+        aireEcoGroupPale
+          .selectAll('path')
+          .data(aireEcoData.features)
+          .join('path')
+          .attr('d', path as any)
+          .attr('fill', 'none')
+          .attr('stroke', '#e23434')
+          .attr('stroke-width', 1.5)
+          .attr('stroke-opacity', 0.3)
+          .attr('pointer-events', 'none')
+      }
+
+      // ======================
+      // BASES MILITAIRES TECHNAT (couche ponctuelle - étapes 1 et 2)
+      // ======================
+      if (!showTrumpGolf && basesMilitaireTechnatData) {
         // Rayon responsive selon la largeur de la fenêtre
         const baseRadius = width < 500 ? 4 : width < 900 ? 5 : 7
         // Font size responsive pour le tooltip
         const tooltipFontSize = width < 500 ? 10 : width < 900 ? 12 : 16
-        const tooltip = d3.select(document.body)
+        const tooltip = d3.select(container)
           .selectAll('.military-tooltip')
           .data([null])
           .join('div')
@@ -530,7 +524,7 @@ function App() {
           .style('font-family', '"Publico Text Web Regular", serif')
           .style('font-size', tooltipFontSize + 'px')
           .style('box-shadow', '0 2px 8px rgba(0,0,0,0.10)')
-          .style('z-index', 10000)
+          .style('z-index', 3000)
           .style('opacity', 0)
 
         svg.append('g')
@@ -548,9 +542,9 @@ function App() {
           })
           .attr('r', baseRadius)
           .attr('fill', '#DD203C')
-          .attr('fill-opacity', 1)
+          .attr('fill-opacity', showTechnat ? 1 : 0.3)
           .attr('stroke', '#ffffff')
-          .attr('stroke-opacity', 1)
+          .attr('stroke-opacity', showTechnat ? 1 : 0.3)
           .attr('stroke-width', 2)
           .on('mousemove', function(event, d) {
             // Masquer le tooltip des pays (priorité aux bases)
@@ -605,7 +599,7 @@ function App() {
       if (!showTechnat && basesUsa2025Data) {
         const baseRadius = width < 500 ? 4 : width < 900 ? 5 : 7
         const tooltipFontSize = width < 500 ? 10 : width < 900 ? 12 : 16
-        const tooltipUsa = d3.select(document.body)
+        const tooltipUsa = d3.select(container)
           .selectAll('.usa-tooltip')
           .data([null])
           .join('div')
@@ -620,7 +614,7 @@ function App() {
           .style('font-family', '"Publico Text Web Regular", serif')
           .style('font-size', tooltipFontSize + 'px')
           .style('box-shadow', '0 2px 8px rgba(0,0,0,0.10)')
-          .style('z-index', 10000)
+          .style('z-index', 3000)
           .style('opacity', 0)
 
         svg.append('g')
@@ -685,7 +679,46 @@ function App() {
               .style('opacity', 1)
           })
 
-        // Tooltip affiché uniquement lors du survol direct d'un cercle (plus de tooltip à proximité)
+        // Affichage du tooltip à proximité (zone de tolérance)
+        svg.on('mousemove.usa-bases-tooltip', function(event) {
+          const [mx, my] = d3.pointer(event, this)
+          const tooltipNode = tooltipUsa.node() as HTMLDivElement
+          if (!tooltipNode) return
+          let found = false
+          basesUsa2025Data.features.forEach(d => {
+            const coords = projection(d.geometry.coordinates as [number, number])
+            if (coords) {
+              const dx = coords[0] - mx
+              const dy = coords[1] - my
+              const dist = Math.sqrt(dx*dx + dy*dy)
+              if (dist < baseRadius + 8) {
+                // Masquer le tooltip des pays seulement si on trouve une base à proximité
+                d3.selectAll('.country-tooltip').style('opacity', 0)
+                tooltipUsa.text(d.properties.NAME_CITY || 'USA')
+                const margin = 10
+                const tooltipWidth = tooltipNode.offsetWidth
+                const tooltipHeight = tooltipNode.offsetHeight
+                let left = event.clientX + margin
+                let top = event.clientY + margin
+                if (left + tooltipWidth > window.innerWidth - margin)
+                  left = event.clientX - tooltipWidth - margin
+                if (top + tooltipHeight > window.innerHeight - margin)
+                  top = event.clientY - tooltipHeight - margin
+                tooltipUsa
+                  .style('left', `${left}px`)
+                  .style('top', `${top}px`)
+                  .style('opacity', 1)
+                found = true
+              }
+            }
+          })
+          if (!found) {
+            tooltipUsa.style('opacity', 0)
+          }
+        })
+        svg.on('mouseleave.usa-bases-tooltip', function() {
+          tooltipUsa.style('opacity', 0)
+        })
       }
 
       // ======================
@@ -747,27 +780,26 @@ function App() {
       // LABELS DES PAYS (ÉTAPES 1 ET 2)
       // ======================
       if (!showTrumpGolf) {
-        // Labels communs aux deux étapes
-        const commonLabels = [
-          { label: 'États-Unis', nameFr: 'États-Unis' },
-          { label: 'Canada', nameFr: 'Canada' },
-          { label: 'Groenland', nameFr: 'Groenland' },
-          { label: 'Venezuela', nameFr: 'Venezuela' }
-        ]
-        
-        // Labels supplémentaires pour l'étape 2
-        const step2OnlyLabels = [
-          { label: 'Mexique', nameFr: 'Mexique' },
-          { label: 'Colombie', nameFr: 'Colombie' }
-        ]
-        
         const countryLabels = !showTechnat 
-          ? commonLabels
-          : [...commonLabels, ...step2OnlyLabels]
+          ? [
+              { label: 'États-Unis', nameFr: 'États-Unis' },
+              { label: 'Canada', nameFr: 'Canada' },
+              { label: 'Mexique', nameFr: 'Mexique' },
+              { label: 'Groenland', nameFr: 'Groenland' },
+              { label: 'Venezuela', nameFr: 'Venezuela' }
+            ]
+          : [
+              { label: 'États-Unis', nameFr: 'États-Unis' },
+              { label: 'Canada', nameFr: 'Canada' },
+              { label: 'Mexique', nameFr: 'Mexique' },
+              { label: 'Groenland', nameFr: 'Groenland' },
+              { label: 'Venezuela', nameFr: 'Venezuela' },
+              { label: 'Colombie', nameFr: 'Colombie' }
+            ]
 
         const labelFontSize = width < 600 ? 11 : width < 900 ? 14 : 18
 
-        countryLabels.forEach(({ label, nameFr }, index) => {
+        countryLabels.forEach(({ label, nameFr }) => {
           const country = filteredFeatures.find(f => f.properties.NAME_FR === nameFr)
           if (country) {
             const centroid = d3.geoCentroid(country as any)
@@ -783,12 +815,8 @@ function App() {
                 offsetY = -10
               }
               
-              // Vérifier si c'est un nouveau label de l'étape 2
-              const isNewStep2Label = showTechnat && step2OnlyLabels.some(l => l.label === label)
-              
               const labelGroup = svg.append('g')
                 .attr('class', `country-label-${label}`)
-                .style('opacity', isNewStep2Label ? 0 : 1)
               
               // Contour rouge
               labelGroup.append('text')
@@ -817,14 +845,6 @@ function App() {
                 .attr('fill', '#ffffff')
                 .attr('text-anchor', 'middle')
                 .attr('alignment-baseline', 'middle')
-              
-              // Animation d'apparition pour les nouveaux labels de l'étape 2
-              if (isNewStep2Label) {
-                labelGroup.transition()
-                  .delay(600 + index * 100)
-                  .duration(500)
-                  .style('opacity', 1)
-              }
             }
           }
         })
@@ -1150,26 +1170,25 @@ function App() {
                 position: 'absolute',
                 left: { xs: 12, md: 16 },
                 top: { xs: 12, md: 16 },
-                bgcolor: 'rgba(255,255,255,0.98)',
-                px: { xs: 2, sm: 2.5, md: 3 },
-                py: { xs: 1, sm: 1.2, md: 1.5 },
-                borderRadius: 2,
-                boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
-                fontSize: { xs: '12px', sm: '14px', md: '15px' },
-                color: '#333',
+                bgcolor: 'rgba(255,255,255,0.95)',
+                px: { xs: 1.5, sm: 2, md: 2.5 },
+                py: { xs: 0.8, sm: 1, md: 1.2 },
+                borderRadius: 6,
+                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                fontSize: { xs: '10px', sm: '12px', md: '13px' },
+                color: '#666',
                 fontFamily: '"Open Sans", sans-serif',
-                fontWeight: 600,
                 animation: 'pulseSubtle 2.5s ease-in-out infinite',
                 '@keyframes pulseSubtle': {
-                  '0%': { opacity: 0.85, transform: 'scale(1)' },
-                  '50%': { opacity: 1, transform: 'scale(1.05)' },
-                  '100%': { opacity: 0.85, transform: 'scale(1)' },
+                  '0%': { opacity: 0.6, transform: 'scale(1)' },
+                  '50%': { opacity: 0.9, transform: 'scale(1.03)' },
+                  '100%': { opacity: 0.6, transform: 'scale(1)' },
                 },
                 zIndex: 101,
                 textAlign: 'center',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 0.8,
+                gap: 0.6,
                 pointerEvents: 'none',
               }}
             >
@@ -1273,7 +1292,7 @@ function App() {
       >
         <Box
           sx={{
-            width: '100%',
+            width: { xs: '100%', sm: '80%', md: '50%' },
             maxHeight: '80vh',
             overflow: 'auto',
             bgcolor: 'rgba(255,255,255,0.97)',
@@ -1283,14 +1302,14 @@ function App() {
             fontSize: { xs: '14px', sm: '16px', md: '18px' },
             lineHeight: 1.8,
             color: '#1b1b1b',
-            fontFamily: '"Open Sans", sans-serif',
+            fontFamily: '"Publico Text Web Regular", serif',
           }}
         >
           {/* Contenu de l'intro */}
           {currentStep === 0 && (
             <>
               <Box sx={{ 
-                fontFamily: '"Open Sans", sans-serif',
+                fontFamily: '"Sanomat Web Medium Regular"',
                 fontSize: { xs: '18px', sm: '22px', md: '26px' },
                 fontWeight: 'bold',
                 mb: 2,
@@ -1331,7 +1350,7 @@ function App() {
           {currentStep === 1 && (
             <>
               <Box sx={{ 
-                fontFamily: '"Open Sans", sans-serif',
+                fontFamily: '"Sanomat Web Medium Regular"',
                 fontSize: { xs: '16px', sm: '20px', md: '24px' },
                 fontWeight: 'bold',
                 mb: 2,
@@ -1360,7 +1379,7 @@ function App() {
           {currentStep === 2 && (
             <>
               <Box sx={{ 
-                fontFamily: '"Open Sans", sans-serif',
+                fontFamily: '"Sanomat Web Medium Regular"',
                 fontSize: { xs: '16px', sm: '20px', md: '24px' },
                 fontWeight: 'bold',
                 mb: 2,
@@ -1389,7 +1408,7 @@ function App() {
           {currentStep === 3 && (
             <>
               <Box sx={{ 
-                fontFamily: '"Open Sans", sans-serif',
+                fontFamily: '"Sanomat Web Medium Regular"',
                 fontSize: { xs: '16px', sm: '20px', md: '24px' },
                 fontWeight: 'bold',
                 mb: 2,

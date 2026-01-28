@@ -190,13 +190,11 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
       <Box sx={{ 
         width: { xs: 14, md: 16 }, 
         height: { xs: 14, md: 16 }, 
-        borderRadius: '50%',
         backgroundColor: '#DD203C', 
-        border: '2px solid #fff',
         flexShrink: 0
       }} />
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Bases militaires du Technat
+        Bases militaires
       </Box>
     </Box>,
     <Box 
@@ -328,7 +326,17 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
       </Box>
     </Box>,
     <Box 
-      key="frontiere-actuelle"
+      key="separator-1"
+      sx={{ 
+        width: '100%',
+        height: '1px',
+        backgroundColor: '#d0d0d0',
+        my: { xs: 0.5, md: 0.3 },
+        flexShrink: 0
+      }}
+    />,
+    <Box 
+      key="technat-pale"
       sx={{ 
         display: 'flex', 
         alignItems: 'center', 
@@ -338,32 +346,116 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
       }}
     >
       <Box sx={{ 
-        width: { xs: 16, md: 20 }, 
-        height: { xs: 16, md: 20 }, 
-        position: 'relative',
-        backgroundColor: '#e0dcdc',
-        flexShrink: 0,
-        overflow: 'hidden'
-      }}>
-        <svg
-          width="100%"
-          height="100%"
-          viewBox="0 0 20 20"
-          preserveAspectRatio="none"
-          style={{ position: 'absolute', top: 0, left: 0 }}
-        >
-          <path
-            d="M 0,10 L 2,11 L 5,9 L 8,11 L 10,10 L 12,12 L 15,9 L 18,11 L 20,10"
-            stroke="#ffffff"
-            strokeWidth="2.5"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </Box>
+        width: { xs: 14, md: 20 }, 
+        height: { xs: 14, md: 20 }, 
+        backgroundColor: '#DD203C',
+        opacity: 0.2,
+        flexShrink: 0
+      }} />
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Frontières actuelles
+        Technat
+      </Box>
+    </Box>,
+    <Box 
+      key="bases-technat-pale"
+      sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: { xs: 0.5, md: 0.8 },
+        transition: 'opacity 0.6s ease-in-out',
+        opacity: 1
+      }}
+    >
+      <Box sx={{ 
+        width: { xs: 12, md: 16 }, 
+        height: { xs: 12, md: 16 }, 
+        borderRadius: '50%', 
+        backgroundColor: '#DD203C', 
+        opacity: 0.25,
+        border: '3px solid #fff',
+       
+        flexShrink: 0
+      }} />
+      <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
+        Bases militaires du Technat
+      </Box>
+    </Box>,
+    <Box 
+      key="reseau-pale"
+      sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: { xs: 0.5, md: 0.8 },
+        transition: 'opacity 0.6s ease-in-out',
+        opacity: 1
+      }}
+    >
+      <Box sx={{ 
+        width: { xs: 24, md: 36 }, 
+        height: { xs: 6, md: 8 }, 
+        borderTop: '3px solid #bfbfbf',
+        backgroundColor: 'transparent',
+        opacity: 0.4,
+        flexShrink: 0
+      }} />
+      <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
+        Réseaux de bases du Technat
+      </Box>
+    </Box>,
+    <Box 
+      key="frontiere-technat-pale"
+      sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: { xs: 0.5, md: 0.8 },
+        transition: 'opacity 0.6s ease-in-out',
+        opacity: 1
+      }}
+    >
+      <Box sx={{ 
+        width: { xs: 24, md: 36 }, 
+        height: { xs: 6, md: 8 }, 
+        borderTop: '2px dashed #DD203C',
+        backgroundColor: 'transparent',
+        opacity: 0.2,
+        flexShrink: 0
+      }} />
+      <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
+        Frontières du Technat
+      </Box>
+    </Box>,
+    <Box 
+      key="separator-2"
+      sx={{ 
+         
+        width: '100%',
+        height: '1px',
+        backgroundColor: '#d0d0d0',
+        my: { xs: 0.5, md: 0.3 },
+        flexShrink: 0
+        
+      }}
+    />,
+    <Box 
+      key="aire-eco-pale"
+      sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: { xs: 0.5, md: 0.8 },
+        transition: 'opacity 0.6s ease-in-out',
+        opacity: 1
+      }}
+    >
+      <Box sx={{ 
+        width: { xs: 24, md: 36 }, 
+        height: { xs: 6, md: 8 }, 
+        borderTop: '2px solid #e23434',
+        backgroundColor: 'transparent',
+        opacity: 0.3,
+        flexShrink: 0
+      }} />
+      <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
+        Aires économiques de Fried
       </Box>
     </Box>
   ]
@@ -388,11 +480,12 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
           position: 'absolute',
           display: 'flex',
           alignItems: 'center',
-          gap: { xs: 1.5, md: 3 },
+          rowGap: { xs: 0.4, md: 0.6 },
+          columnGap: { xs: 0.4, md: 2 },
           flexWrap: 'wrap',
           justifyContent: 'flex-start',
           width: 'calc(100% - 32px)',
-          px: { xs: 0.5, md: 1 }
+          px: { xs: 0.1, md: 1 }
         }}>
           {step3Items}
         </Box>
