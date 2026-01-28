@@ -61,55 +61,83 @@ function App() {
   // Refs pour les sections de scrollytelling
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([])
 
+  // Fonction pour mettre à jour l'état en fonction de la section active
+  const updateSectionState = (index: number) => {
+    setActiveSection(index)
+    // Mettre à jour l'étape de la carte en fonction de la section
+    if (index === 0) {
+      setCurrentStep(0) // Intro
+    } else if (index === 1) {
+      setCurrentStep(1) // Étape 1 - Trump
+    } else if (index === 2) {
+      setCurrentStep(1) // Exploration carte 1
+    } else if (index === 3) {
+      setCurrentStep(2) // Étape 2 - Technat
+    } else if (index === 4) {
+      setCurrentStep(2) // Exploration carte 2
+    } else if (index === 5) {
+      setCurrentStep(3) // Étape 3 - Économies
+    } else if (index === 6) {
+      setCurrentStep(3) // Exploration carte 3
+    }
+    
+    // Gérer le flou selon la section
+    if (index === 0) {
+      setBlurAmount(3) // Intro floute
+    } else if (index % 2 === 0) {
+      setBlurAmount(0) // Exploration
+    } else {
+      setBlurAmount(3) // Texte
+    }
+    
+    // Masquer le prompt après le premier scroll
+    if (index > 0) {
+      setShowScrollPrompt(false)
+    }
+  }
+
   // Intersection Observer pour le scrollytelling
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const index = sectionRefs.current.indexOf(entry.target as HTMLDivElement)
-            if (index !== -1) {
-              setActiveSection(index)
-              // Mettre à jour l'étape de la carte en fonction de la section
-              if (index === 0) {
-                setCurrentStep(0) // Intro
-              } else if (index === 1) {
-                setCurrentStep(1) // Étape 1 - Trump
-              } else if (index === 2) {
-                setCurrentStep(1) // Exploration carte 1
-              } else if (index === 3) {
-                setCurrentStep(2) // Étape 2 - Technat
-              } else if (index === 4) {
-                setCurrentStep(2) // Exploration carte 2
-              } else if (index === 5) {
-                setCurrentStep(3) // Étape 3 - Économies
-              } else if (index === 6) {
-                setCurrentStep(3) // Exploration carte 3
-              }
-              
-              // Gérer le flou selon la section
-              // Sections paires (0, 2, 4, 6) = exploration carte = pas de flou
-              // Sections impaires (1, 3, 5) = texte = flou
-              if (index === 0) {
-                setBlurAmount(3) // Intro floute
-              } else if (index % 2 === 0) {
-                setBlurAmount(0) // Exploration
-              } else {
-                setBlurAmount(3) // Texte
-              }
-              
-              // Masquer le prompt après le premier scroll
-              if (index > 0 && showScrollPrompt) {
-                setShowScrollPrompt(false)
-              }
+    // Fonction pour trouver la section la plus proche du centre
+    const findCenteredSection = () => {
+      const viewportCenter = window.innerHeight / 2
+      let bestSection = -1
+      let bestDistance = Infinity
+      
+      sectionRefs.current.forEach((ref, index) => {
+        if (ref) {
+          const rect = ref.getBoundingClientRect()
+          const sectionCenter = rect.top + rect.height / 2
+          const distance = Math.abs(sectionCenter - viewportCenter)
+          
+          // Vérifier que la section est au moins partiellement visible
+          if (rect.bottom > 0 && rect.top < window.innerHeight) {
+            if (distance < bestDistance) {
+              bestDistance = distance
+              bestSection = index
             }
           }
-        })
+        }
+      })
+      
+      return bestSection
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Quand une intersection change, trouver la section la plus centrée
+        const hasIntersecting = entries.some(entry => entry.isIntersecting)
+        if (hasIntersecting) {
+          const centeredSection = findCenteredSection()
+          if (centeredSection !== -1) {
+            updateSectionState(centeredSection)
+          }
+        }
       },
       {
         root: null,
-        rootMargin: '-40% 0px -40% 0px', // Déclenche quand la section est au centre
-        threshold: 0,
+        rootMargin: '-30% 0px -30% 0px',
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
       }
     )
 
@@ -117,8 +145,33 @@ function App() {
       if (ref) observer.observe(ref)
     })
 
-    return () => observer.disconnect()
-  }, [showScrollPrompt])
+    // Gestionnaire de scroll pour détecter les changements de direction
+    const handleScroll = () => {
+      const centeredSection = findCenteredSection()
+      if (centeredSection !== -1) {
+        updateSectionState(centeredSection)
+      }
+    }
+
+    // Throttle le scroll handler pour les performances
+    let ticking = false
+    const throttledScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll()
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    window.addEventListener('scroll', throttledScroll, { passive: true })
+
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('scroll', throttledScroll)
+    }
+  }, [])
 
   // Dériver showTechnat et showTrumpGolf depuis currentStep
   const showTechnat = currentStep >= 2
