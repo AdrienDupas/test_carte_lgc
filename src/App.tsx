@@ -1306,7 +1306,7 @@ function App() {
         {/* Legend */}
         <Box sx={{ 
           width: '100%', 
-          minHeight: { xs: '120px', sm: '90px', md: '90px' }, 
+          minHeight: { xs: '135px', sm: '90px', md: '90px' }, 
           flexShrink: 0,
           filter: `blur(${blurAmount}px)`,
           transition: 'filter 0.5s ease-out'
