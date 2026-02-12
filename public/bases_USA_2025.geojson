@@ -6,10 +6,7 @@
 { "type": "Feature", "properties": { "id": null, "NAME_CITY": "Guantánamo" }, "geometry": { "type": "Point", "coordinates": [ -75.155393493002379, 19.925263027674777 ] } },
 { "type": "Feature", "properties": { "id": null, "NAME_CITY": "Pituffik" }, "geometry": { "type": "Point", "coordinates": [ -68.607494221464734, 76.532371170724019 ] } },
 { "type": "Feature", "properties": { "id": null, "NAME_CITY": "Puerto Rico" }, "geometry": { "type": "Point", "coordinates": [ -66.104986826083746, 18.445088902468342 ] } },
+{ "type": "Feature", "properties": { "id": 90, "NAME_CITY": "Shemya Island" }, "geometry": { "type": "Point", "coordinates": [ -179.662868128272265, 51.413751636125617 ] } },
 { "type": "Feature", "properties": { "id": 5, "NAME_CITY": "Honolulu" }, "geometry": { "type": "Point", "coordinates": [ -157.899727754147392, 21.290715045473178 ] } }
-
-
 ]
 }
-
-

@@ -8,10 +8,22 @@ import Legend from './Legend'
 
 // Textes pour chaque étape
 const stepTexts = {
-  intro: "Ciliciam vero, quae Cydno amni exultat, Tarsus nobilitat, urbs perspicabilis hanc condidisse Perseus memoratur, Iovis filius et Danaes, vel certe ex Aethiopia profectus Sandan quidam nomine vir opulentus et nobilis et Anazarbus auctoris vocabulum referens, et Mopsuestia vatis illius domicilium Mopsi, quem a conmilitio Argonautarum cum aureo vellere direpto redirent, errore abstractum delatumque ad Africae litus mors repentina consumpsit, et ex eo cespite punico tecti manes eius heroici dolorum varietati medentur plerumque sospitales.",
-  step1: "Ciliciam vero, quae Cydno amni exultat, Tarsus nobilitat, urbs perspicabilis hanc condidisse Perseus memoratur, Iovis filius et Danaes, vel certe ex Aethiopia profectus Sandan quidam nomine vir opulentus et nobilis et Anazarbus auctoris vocabulum referens, et Mopsuestia vatis illius domicilium Mopsi, quem a conmilitio Argonautarum cum aureo vellere direpto redirent, errore abstractum delatumque ad Africae litus mors repentina consumpsit, et ex eo cespite punico tecti manes eius heroici dolorum varietati medentur plerumque sospitales.",
-  step2: "Ciliciam vero, quae Cydno amni exultat, Tarsus nobilitat, urbs perspicabilis hanc condidisse Perseus memoratur, Iovis filius et Danaes, vel certe ex Aethiopia profectus Sandan quidam nomine vir opulentus et nobilis et Anazarbus auctoris vocabulum referens, et Mopsuestia vatis illius domicilium Mopsi, quem a conmilitio Argonautarum cum aureo vellere direpto redirent, errore abstractum delatumque ad Africae litus mors repentina consumpsit, et ex eo cespite punico tecti manes eius heroici dolorum varietati medentur plerumque sospitales.",
-  step3: "Ciliciam vero, quae Cydno amni exultat, Tarsus nobilitat, urbs perspicabilis hanc condidisse Perseus memoratur, Iovis filius et Danaes, vel certe ex Aethiopia profectus Sandan quidam nomine vir opulentus et nobilis et Anazarbus auctoris vocabulum referens, et Mopsuestia vatis illius domicilium Mopsi, quem a conmilitio Argonautarum cum aureo vellere direpto redirent, errore abstractum delatumque ad Africae litus mors repentina consumpsit, et ex eo cespite punico tecti manes eius heroici dolorum varietati medentur plerumque sospitales."
+  intro: `Depuis son retour à la Maison-Blanche, Donald Trump joue avec les limites du pouvoir exécutif pour changer les frontières des États-Unis, qui n’avaient plus guère bougé depuis plus d’un siècle.
+
+L’accroissement territorial du pays est désormais une doctrine officielle.`,
+  step1: `À plusieurs reprises, Donald Trump a fait part de son souhait de voir le Canada, le Groenland et le canal de Panama passer sous souveraineté étatsunienne.
+
+Dans une forme d’impérialisme toponymique, il a par ailleurs insisté pour que le golfe du Mexique soit désormais appelé golfe d’Amérique.
+
+Après l’enlèvement du président Maduro, il a laissé entendre qu’il envisageait également d’annexer le Venezuela.`,
+  step2: `Les revendications territoriales de Donald Trump présentent de troublantes analogies avec des projets expansionnistes étatsuniens des années 1930.
+
+L’un d’eux était porté par le mouvement technocratique d’Howard Scott, qui plaidait pour la réunion en un seul État de l’ensemble de l’Amérique du Nord, des Caraïbes, ainsi que le nord de l’Amérique du sud et le bassin oriental du Pacifique.
+
+Ce redécoupage devait permettre de mieux exploiter les ressources naturelles de l’Amérique du Nord et de la préserver de toute interférence exogène.`,
+  step3: `Comme celui de Trump, le projet géopolitique d’Howard Scott repose sur une corrélation entre la taille d’un territoire et la puissance de l’État qui le contrôle.
+
+Cette obsession pour la grandeur territoriale associée à la prospérité et à la puissance est très présente chez certains théoriciens nationalistes allemands de l’entre-deux-guerres : l’économiste Ferdinand Fried, qui théorise la division du monde en quatre « économies de grands espaces », le géopoliticien Karl Haushofer ou encore le juriste Carl Schmitt.`
 }
 
 interface CountryProperties {
@@ -271,6 +283,22 @@ function App() {
         .attr('stroke', '#DD203C')
         .attr('stroke-width', 3)
 
+      // Pattern de hachures rouges foncées pour Trump à l'étape 2
+      const patternBlack = defs.append('pattern')
+        .attr('id', 'black-hatch')
+        .attr('patternUnits', 'userSpaceOnUse')
+        .attr('width', 11)
+        .attr('height', 11)
+        .attr('patternTransform', 'rotate(45)')
+      
+      patternBlack.append('line')
+        .attr('x1', 0)
+        .attr('y1', 0)
+        .attr('x2', 0)
+        .attr('y2', 11)
+        .attr('stroke', '#ba0202')
+        .attr('stroke-width', 3)
+
       // ======================
       // BASE MAP
       // ======================
@@ -304,66 +332,60 @@ function App() {
       
       // Note: Le label Canal du Panama est maintenant rendu après les groupes Trump/Venezuela (voir plus bas)
       
-      // Gestionnaire global de tooltip pour les étapes 2 et 3
-      if (showTechnat) {
-        svg.on('mousemove.country-tooltip', function(event) {
-          // Ne pas afficher le tooltip des pays si un autre tooltip est visible
-          if (d3.selectAll('.military-tooltip').filter(function() { 
-            return d3.select(this).style('opacity') !== '0' 
-          }).size() > 0) {
-            return
-          }
-          if (d3.selectAll('.usa-tooltip').filter(function() { 
-            return d3.select(this).style('opacity') !== '0' 
-          }).size() > 0) {
-            return
-          }
-          
-          const [mx, my] = d3.pointer(event, this)
-          const coords = projection.invert ? projection.invert([mx, my]) : null
-          
-          if (coords) {
-            // Trouver le pays sous la souris
-            const country = filteredFeatures.find(f => {
-              if (f.geometry.type === 'Polygon') {
-                return d3.geoContains(f as any, coords)
-              } else if (f.geometry.type === 'MultiPolygon') {
-                return d3.geoContains(f as any, coords)
-              }
-              return false
-            })
-            
-            if (country) {
-              const tooltipNode = tooltipCountry.node() as HTMLDivElement
-              if (!tooltipNode) return
-              tooltipCountry.text(country.properties.NAME_FR || country.properties.NAME || '')
-              const margin = 10
-              const tooltipWidth = tooltipNode.offsetWidth
-              const tooltipHeight = tooltipNode.offsetHeight
-              let left = event.clientX + margin
-              let top = event.clientY + margin
-              if (left + tooltipWidth > window.innerWidth - margin)
-                left = event.clientX - tooltipWidth - margin
-              if (top + tooltipHeight > window.innerHeight - margin)
-                top = event.clientY - tooltipHeight - margin
-              tooltipCountry
-                .style('left', `${left}px`)
-                .style('top', `${top}px`)
-                .style('opacity', 1)
-            } else {
-              tooltipCountry.style('opacity', 0)
-            }
-          }
-        })
+      // Gestionnaire global de tooltip pour toutes les étapes
+      svg.on('mousemove.country-tooltip', function(event) {
+        // Ne pas afficher le tooltip des pays si un autre tooltip est visible
+        if (d3.selectAll('.military-tooltip').filter(function() { 
+          return d3.select(this).style('opacity') !== '0' 
+        }).size() > 0) {
+          return
+        }
+        if (d3.selectAll('.usa-tooltip').filter(function() { 
+          return d3.select(this).style('opacity') !== '0' 
+        }).size() > 0) {
+          return
+        }
         
-        svg.on('mouseleave.country-tooltip', function() {
-          tooltipCountry.style('opacity', 0)
-        })
-      } else {
-        svg.on('mousemove.country-tooltip', null)
-        svg.on('mouseleave.country-tooltip', null)
+        const [mx, my] = d3.pointer(event, this)
+        const coords = projection.invert ? projection.invert([mx, my]) : null
+        
+        if (coords) {
+          // Trouver le pays sous la souris
+          const country = filteredFeatures.find(f => {
+            if (f.geometry.type === 'Polygon') {
+              return d3.geoContains(f as any, coords)
+            } else if (f.geometry.type === 'MultiPolygon') {
+              return d3.geoContains(f as any, coords)
+            }
+            return false
+          })
+          
+          if (country) {
+            const tooltipNode = tooltipCountry.node() as HTMLDivElement
+            if (!tooltipNode) return
+            tooltipCountry.text(country.properties.NAME_FR || country.properties.NAME || '')
+            const margin = 10
+            const tooltipWidth = tooltipNode.offsetWidth
+            const tooltipHeight = tooltipNode.offsetHeight
+            let left = event.clientX + margin
+            let top = event.clientY + margin
+            if (left + tooltipWidth > window.innerWidth - margin)
+              left = event.clientX - tooltipWidth - margin
+            if (top + tooltipHeight > window.innerHeight - margin)
+              top = event.clientY - tooltipHeight - margin
+            tooltipCountry
+              .style('left', `${left}px`)
+              .style('top', `${top}px`)
+              .style('opacity', 1)
+          } else {
+            tooltipCountry.style('opacity', 0)
+          }
+        }
+      })
+      
+      svg.on('mouseleave.country-tooltip', function() {
         tooltipCountry.style('opacity', 0)
-      }
+      })
 
       // ======================
       // RÉSEAU BASE (couche visible à l'étape 2 uniquement)
@@ -1284,7 +1306,7 @@ function App() {
         {/* Legend */}
         <Box sx={{ 
           width: '100%', 
-          minHeight: { xs: '150px', sm: '100px', md: '104px' }, 
+          minHeight: { xs: '120px', sm: '90px', md: '90px' }, 
           flexShrink: 0,
           filter: `blur(${blurAmount}px)`,
           transition: 'filter 0.5s ease-out'
@@ -1328,7 +1350,7 @@ function App() {
             <Box sx={{ 
               fontFamily: '"Open Sans", sans-serif',
               fontSize: { xs: '18px', sm: '22px', md: '26px' },
-              fontWeight: 'bold',
+              fontWeight: 800,
               mb: 2,
               color: '#DD203C'
             }}>
@@ -1336,11 +1358,15 @@ function App() {
             </Box>
             <Box sx={{
               fontSize: { xs: '14px', sm: '16px', md: '18px' },
-              lineHeight: 1.8,
+              lineHeight: 1.5,
               color: '#1b1b1b',
               fontFamily: '"Open Sans", sans-serif',
             }}>
-              {stepTexts.intro}
+              {stepTexts.intro.split('\n\n').map((para, i) => (
+                <Box key={i} sx={{ mb: i < stepTexts.intro.split('\n\n').length - 1 ? '11px' : 0 }}>
+                  {para}
+                </Box>
+              ))}
             </Box>
             <Box sx={{
               display: 'flex',
@@ -1395,8 +1421,8 @@ function App() {
           >
             <Box sx={{ 
               fontFamily: '"Open Sans", sans-serif',
-              fontSize: { xs: '16px', sm: '20px', md: '24px' },
-              fontWeight: 'bold',
+              fontSize: { xs: '18px', sm: '22px', md: '26px' },
+              fontWeight: 800,
               mb: 2,
               color: '#DD203C'
             }}>
@@ -1404,11 +1430,15 @@ function App() {
             </Box>
             <Box sx={{
               fontSize: { xs: '14px', sm: '16px', md: '18px' },
-              lineHeight: 1.8,
+              lineHeight: 1.5,
               color: '#1b1b1b',
               fontFamily: '"Open Sans", sans-serif',
             }}>
-              {stepTexts.step1}
+              {stepTexts.step1.split('\n\n').map((para, i) => (
+                <Box key={i} sx={{ mb: i < stepTexts.step1.split('\n\n').length - 1 ? '11px' : 0 }}>
+                  {para}
+                </Box>
+              ))}
             </Box>
             <Box sx={{
               display: 'flex',
@@ -1484,8 +1514,8 @@ function App() {
           >
             <Box sx={{ 
               fontFamily: '"Open Sans", sans-serif',
-              fontSize: { xs: '16px', sm: '20px', md: '24px' },
-              fontWeight: 'bold',
+              fontSize: { xs: '18px', sm: '22px', md: '26px' },
+              fontWeight: 800,
               mb: 2,
               color: '#DD203C'
             }}>
@@ -1493,11 +1523,15 @@ function App() {
             </Box>
             <Box sx={{
               fontSize: { xs: '14px', sm: '16px', md: '18px' },
-              lineHeight: 1.8,
+              lineHeight: 1.5,
               color: '#1b1b1b',
               fontFamily: '"Open Sans", sans-serif',
             }}>
-              {stepTexts.step2}
+              {stepTexts.step2.split('\n\n').map((para, i) => (
+                <Box key={i} sx={{ mb: i < stepTexts.step2.split('\n\n').length - 1 ? '11px' : 0 }}>
+                  {para}
+                </Box>
+              ))}
             </Box>
             <Box sx={{
               display: 'flex',
@@ -1573,8 +1607,8 @@ function App() {
           >
             <Box sx={{ 
               fontFamily: '"Open Sans", sans-serif',
-              fontSize: { xs: '16px', sm: '20px', md: '24px' },
-              fontWeight: 'bold',
+              fontSize: { xs: '18px', sm: '22px', md: '26px' },
+              fontWeight: 800,
               mb: 2,
               color: '#DD203C'
             }}>
@@ -1582,11 +1616,15 @@ function App() {
             </Box>
             <Box sx={{
               fontSize: { xs: '14px', sm: '16px', md: '18px' },
-              lineHeight: 1.8,
+              lineHeight: 1.5,
               color: '#1b1b1b',
               fontFamily: '"Open Sans", sans-serif',
             }}>
-              {stepTexts.step3}
+              {stepTexts.step3.split('\n\n').map((para, i) => (
+                <Box key={i} sx={{ mb: i < stepTexts.step3.split('\n\n').length - 1 ? '11px' : 0 }}>
+                  {para}
+                </Box>
+              ))}
             </Box>
             <Box sx={{
               display: 'flex',
