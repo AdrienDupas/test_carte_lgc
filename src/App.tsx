@@ -47,6 +47,7 @@ function App() {
   const svgRef = useRef<SVGSVGElement>(null)
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const parentControllingRef = useRef(false)
 
   const [geojsonData, setGeojsonData] = useState<GeoJSON | null>(null)
   const [world2025Data, setWorld2025Data] = useState<GeoJSON | null>(null)
@@ -162,6 +163,8 @@ function App() {
     if (!mapContainer || !scrollContainer) return
 
     const handleWheel = (e: WheelEvent) => {
+      // Ne pas propager si le parent contrôle le scroll (sinon double-scroll sur Chrome)
+      if (parentControllingRef.current) return
       // Propager le scroll au conteneur parent
       scrollContainer.scrollBy({
         top: e.deltaY,
@@ -178,6 +181,139 @@ function App() {
       }
     }
   }, [activeSection])
+
+  // ======================
+  // COMMUNICATION IFRAME → PARENT (postMessage)
+  // Envoie reactScrollTop / reactScrollBottom / reactScrollMiddle
+  // ======================
+  useEffect(() => {
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    let lastState: 'top' | 'bottom' | 'middle' = 'top'
+
+    const handleScrollMessage = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container
+
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 2
+      const atTop = scrollTop <= 0
+
+      if (atBottom && lastState !== 'bottom') {
+        window.parent.postMessage({ type: 'reactScrollBottom' }, '*')
+        lastState = 'bottom'
+        return
+      }
+
+      if (atTop && lastState !== 'top') {
+        window.parent.postMessage({ type: 'reactScrollTop' }, '*')
+        lastState = 'top'
+        return
+      }
+
+      if (!atTop && !atBottom && lastState !== 'middle') {
+        window.parent.postMessage({ type: 'reactScrollMiddle' }, '*')
+        lastState = 'middle'
+      }
+    }
+
+    container.addEventListener('scroll', handleScrollMessage, { passive: true })
+
+    // Envoyer l'état initial au parent
+    handleScrollMessage()
+
+    return () => {
+      container.removeEventListener('scroll', handleScrollMessage)
+    }
+  }, [])
+
+  // ======================
+  // RÉCEPTION DU SCROLL PARENT → IFRAME (postMessage)
+  // + Blocage des wheel natifs pour éviter le double-scroll sur Chrome
+  // ======================
+  useEffect(() => {
+    const container = scrollContainerRef.current
+    if (!container) return
+    const isInIframe = window.parent !== window
+
+    let controlTimeout: ReturnType<typeof setTimeout> | null = null
+
+    const handleParentMessage = (event: MessageEvent) => {
+      const { type, deltaY } = event.data || {}
+      if (type !== 'parentWheel') return
+
+      // Marquer qu'on est contrôlé par le parent
+      parentControllingRef.current = true
+      if (controlTimeout) clearTimeout(controlTimeout)
+      controlTimeout = setTimeout(() => { parentControllingRef.current = false }, 200)
+
+      // Vérifier la boundary AVANT de scroller
+      const { scrollTop, scrollHeight, clientHeight } = container
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 2
+      const atTop = scrollTop <= 0
+
+      if ((deltaY > 0 && atBottom) || (deltaY < 0 && atTop)) {
+        // On ne peut plus scroller dans cette direction → dire au parent
+        if (isInIframe) {
+          window.parent.postMessage({ type: 'iframeBoundaryWheel', deltaY }, '*')
+        }
+        return
+      }
+
+      container.scrollBy({ top: deltaY, behavior: 'auto' })
+    }
+
+    // Bloquer les wheel natifs quand le parent contrôle
+    // (empêche Chrome de scroller l'iframe en double)
+    const blockNativeWheel = (e: WheelEvent) => {
+      if (parentControllingRef.current) {
+        e.preventDefault()
+      }
+    }
+
+    window.addEventListener('message', handleParentMessage)
+    window.addEventListener('wheel', blockNativeWheel, { passive: false })
+
+    return () => {
+      window.removeEventListener('message', handleParentMessage)
+      window.removeEventListener('wheel', blockNativeWheel)
+      if (controlTimeout) clearTimeout(controlTimeout)
+    }
+  }, [])
+
+  // ======================
+  // FORWARD BOUNDARY WHEEL EVENTS TO PARENT
+  // Quand l'app est à une limite (haut/bas) et reçoit un wheel dans la même direction,
+  // on prévient le parent pour qu'il relâche le capture et reprenne le scroll de la page.
+  // ======================
+  useEffect(() => {
+    // Ne rien faire si on n'est pas dans une iframe
+    if (window.parent === window) return
+
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    const handleBoundaryWheel = (e: WheelEvent) => {
+      // Ne pas envoyer si le parent contrôle déjà (géré dans le handler parentWheel)
+      if (parentControllingRef.current) return
+
+      const { scrollTop, scrollHeight, clientHeight } = container
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 2
+      const atTop = scrollTop <= 0
+
+      if ((e.deltaY > 0 && atBottom) || (e.deltaY < 0 && atTop)) {
+        window.parent.postMessage(
+          { type: 'iframeBoundaryWheel', deltaY: e.deltaY },
+          '*'
+        )
+      }
+    }
+
+    window.addEventListener('wheel', handleBoundaryWheel, { passive: true })
+
+    return () => {
+      window.removeEventListener('wheel', handleBoundaryWheel)
+    }
+  }, [])
 
   // Dériver showTechnat et showTrumpGolf depuis currentStep
   const showTechnat = currentStep >= 2
