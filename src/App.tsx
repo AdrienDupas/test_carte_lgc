@@ -13,14 +13,12 @@ const stepTexts = {
 L’accroissement territorial du pays est désormais une doctrine officielle.`,
   step1: `À plusieurs reprises, Donald Trump a fait part de son souhait de voir le Canada, le Groenland et le canal de Panama passer sous souveraineté étatsunienne.
 
-Dans une forme d’impérialisme toponymique, il a par ailleurs insisté pour que le golfe du Mexique soit désormais appelé golfe d’Amérique.
-
 Après l’enlèvement du président Maduro, il a laissé entendre qu’il envisageait également d’annexer le Venezuela.`,
   step2: `Les revendications territoriales de Donald Trump présentent de troublantes analogies avec des projets expansionnistes étatsuniens des années 1930.
 
-L’un d’eux était porté par le mouvement technocratique d’Howard Scott, qui plaidait pour la réunion en un seul État de l’ensemble de l’Amérique du Nord, des Caraïbes, ainsi que le nord de l’Amérique du sud et le bassin oriental du Pacifique.
+L’un d’eux était porté par le mouvement technocratique d’Howard Scott, qui plaidait pour la réunion en un seul État de l’ensemble de l’Amérique du Nord, des Caraïbes, ainsi que le nord de l’Amérique du sud et le bassin oriental du Pacifique.`
 
-Ce redécoupage devait permettre de mieux exploiter les ressources naturelles de l’Amérique du Nord et de la préserver de toute interférence exogène.`,
+,
   step3: `Comme celui de Trump, le projet géopolitique d’Howard Scott repose sur une corrélation entre la taille d’un territoire et la puissance de l’État qui le contrôle.
 
 Cette obsession pour la grandeur territoriale associée à la prospérité et à la puissance est très présente chez certains théoriciens nationalistes allemands de l’entre-deux-guerres : l’économiste Ferdinand Fried, qui théorise la division du monde en quatre « économies de grands espaces », le géopoliticien Karl Haushofer ou encore le juriste Carl Schmitt.`
@@ -1490,7 +1488,7 @@ function App() {
               mb: 2,
               color: '#DD203C'
             }}>
-              Introduction
+            
             </Box>
             <Box sx={{
               fontSize: { xs: '14px', sm: '16px', md: '18px' },
