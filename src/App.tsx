@@ -5,24 +5,7 @@ import * as d3 from 'd3'
 // @ts-ignore
 import { geoGinzburg9 } from 'd3-geo-projection'
 import Legend from './Legend'
-
-// Textes pour chaque étape
-const stepTexts = {
-  intro: `Depuis son retour à la Maison-Blanche, Donald Trump joue avec les limites du pouvoir exécutif pour changer les frontières des États-Unis, qui n’avaient plus guère bougé depuis plus d’un siècle.
-
-L’accroissement territorial du pays est désormais une doctrine officielle.`,
-  step1: `À plusieurs reprises, Donald Trump a fait part de son souhait de voir le Canada, le Groenland et le canal de Panama passer sous souveraineté étatsunienne.
-
-Après l’enlèvement du président Maduro, il a laissé entendre qu’il envisageait également d’annexer le Venezuela.`,
-  step2: `Les revendications territoriales de Donald Trump présentent de troublantes analogies avec des projets expansionnistes étatsuniens des années 1930.
-
-L’un d’eux était porté par le mouvement technocratique d’Howard Scott, qui plaidait pour la réunion en un seul État de l’ensemble de l’Amérique du Nord, des Caraïbes, ainsi que le nord de l’Amérique du sud et le bassin oriental du Pacifique.`
-
-,
-  step3: `Comme celui de Trump, le projet géopolitique d’Howard Scott repose sur une corrélation entre la taille d’un territoire et la puissance de l’État qui le contrôle.
-
-Cette obsession pour la grandeur territoriale associée à la prospérité et à la puissance est très présente chez certains théoriciens nationalistes allemands de l’entre-deux-guerres : l’économiste Ferdinand Fried, qui théorise la division du monde en quatre « économies de grands espaces », le géopoliticien Karl Haushofer ou encore le juriste Carl Schmitt.`
-}
+import { useLanguage } from './hooks/useLanguage'
 
 interface CountryProperties {
   NAME: string
@@ -42,6 +25,7 @@ interface GeoJSON {
 }
 
 function App() {
+  const { language, setLanguage, t } = useLanguage()
   const svgRef = useRef<SVGSVGElement>(null)
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -497,7 +481,10 @@ function App() {
           if (country) {
             const tooltipNode = tooltipCountry.node() as HTMLDivElement
             if (!tooltipNode) return
-            tooltipCountry.text(country.properties.NAME_FR || country.properties.NAME || '')
+            const countryName = language === 'es' 
+              ? (country.properties.NAME_ES || country.properties.NAME_FR || country.properties.NAME || '')
+              : (country.properties.NAME_FR || country.properties.NAME || '')
+            tooltipCountry.text(countryName)
             const margin = 10
             const tooltipWidth = tooltipNode.offsetWidth
             const tooltipHeight = tooltipNode.offsetHeight
@@ -925,7 +912,7 @@ function App() {
             labelGroup.append('text')
               .attr('x', canalCoords[0])
               .attr('y', canalCoords[1] + labelOffsetY)
-              .text('Canal de Panama')
+              .text(t.canalDePanama)
               .attr('font-family', '"Publico Text Web Regular", serif')
               .attr('font-size', labelFontSize)
               .attr('fill', 'none')
@@ -939,7 +926,7 @@ function App() {
             labelGroup.append('text')
               .attr('x', canalCoords[0])
               .attr('y', canalCoords[1] + labelOffsetY)
-              .text('Canal de Panama')
+              .text(t.canalDePanama)
               .attr('font-family', '"Publico Text Web Regular", serif')
               .attr('font-size', labelFontSize)
               .attr('fill', '#DD203C')
@@ -956,16 +943,16 @@ function App() {
       if (!showTrumpGolf) {
         // Labels communs aux deux étapes
         const commonLabels = [
-          { label: 'États-Unis', nameFr: 'États-Unis' },
-          { label: 'Canada', nameFr: 'Canada' },
-          { label: 'Groenland', nameFr: 'Groenland' },
-          { label: 'Venezuela', nameFr: 'Venezuela' }
+          { label: t.countryLabels['États-Unis'], nameFr: 'États-Unis' },
+          { label: t.countryLabels['Canada'], nameFr: 'Canada' },
+          { label: t.countryLabels['Groenland'], nameFr: 'Groenland' },
+          { label: t.countryLabels['Venezuela'], nameFr: 'Venezuela' }
         ]
         
         // Labels supplémentaires pour l'étape 2
         const step2OnlyLabels = [
-          { label: 'Mexique', nameFr: 'Mexique' },
-          { label: 'Colombie', nameFr: 'Colombie' }
+          { label: t.countryLabels['Mexique'], nameFr: 'Mexique' },
+          { label: t.countryLabels['Colombie'], nameFr: 'Colombie' }
         ]
         
         const countryLabels = !showTechnat 
@@ -983,18 +970,18 @@ function App() {
               // Décalages pour certains pays
               let offsetX = 0
               let offsetY = 0
-              if (label === 'Canada') {
+              if (nameFr === 'Canada') {
                 offsetX = -40
-              } else if (label === 'Venezuela') {
+              } else if (nameFr === 'Venezuela') {
                 offsetX = 10
                 offsetY = -10
               }
               
               // Vérifier si c'est un nouveau label de l'étape 2
-              const isNewStep2Label = showTechnat && step2OnlyLabels.some(l => l.label === label)
+              const isNewStep2Label = showTechnat && step2OnlyLabels.some(l => l.nameFr === nameFr)
               
               const labelGroup = svg.append('g')
-                .attr('class', `country-label-${label}`)
+                .attr('class', `country-label-${nameFr}`)
                 .style('opacity', isNewStep2Label ? 0 : 1)
               
               // Contour rouge
@@ -1041,10 +1028,10 @@ function App() {
       // NOMS DES OCÉANS
       // ======================
       const oceans = [
-        { name: 'Océan\nPacifique', coords: [-140, 10] },
-        { name: 'Océan\nAtlantique', coords: [-60, 25] },
-        { name: 'Océan\nIndien', coords: [75, -20] },
-        { name: 'Océan\nArctique', coords: [-5, 80] }
+        { name: t.oceans.pacific, coords: [-140, 10] },
+        { name: t.oceans.atlantic, coords: [-60, 25] },
+        { name: t.oceans.indian, coords: [75, -20] },
+        { name: t.oceans.arctic, coords: [-5, 80] }
       ]
 
       const oceanFontSize = width < 600 ? 10 : width < 900 ? 12 : 16
@@ -1113,7 +1100,8 @@ function App() {
     aireEcoCatData,
     showTechnat,
     showTrumpGolf,
-    currentStep
+    currentStep,
+    language
   ])
 
   // ======================
@@ -1169,20 +1157,20 @@ function App() {
 
     // Noms des océans pour mise à jour pendant la transition
     const oceans = [
-      { name: 'Océan\nPacifique', coords: [-140, 10] },
-      { name: 'Océan\nAtlantique', coords: [-60, 25] },
-      { name: 'Océan\nIndien', coords: [75, -20] },
-      { name: 'Océan\nArctique', coords: [-5, 80] }
+      { name: t.oceans.pacific, coords: [-140, 10] },
+      { name: t.oceans.atlantic, coords: [-60, 25] },
+      { name: t.oceans.indian, coords: [75, -20] },
+      { name: t.oceans.arctic, coords: [-5, 80] }
     ]
     const oceanFontSize = width < 600 ? 10 : width < 900 ? 12 : 16
 
     svg.transition()
       .duration(1300)
       .ease(d3.easeCubicOut)
-      .tween('zoom', () => (t: number) => {
+      .tween('zoom', () => (progress: number) => {
         const p = geoGinzburg9()
-          .scale(scaleI(t))
-          .translate(translateI(t))
+          .scale(scaleI(progress))
+          .translate(translateI(progress))
 
         const tempPath = d3.geoPath().projection(p)
         
@@ -1216,21 +1204,21 @@ function App() {
 
         // Mettre à jour les labels des pays
         const countryLabels = [
-          { label: 'États-Unis', nameFr: 'États-Unis', offsetX: 0, offsetY: 0 },
-          { label: 'Canada', nameFr: 'Canada', offsetX: -40, offsetY: 0 },
-          { label: 'Mexique', nameFr: 'Mexique', offsetX: 0, offsetY: 0 },
-          { label: 'Groenland', nameFr: 'Groenland', offsetX: 0, offsetY: 0 },
-          { label: 'Venezuela', nameFr: 'Venezuela', offsetX: 10, offsetY: -10 },
-          { label: 'Colombie', nameFr: 'Colombie', offsetX: 0, offsetY: 0 }
+          { label: t.countryLabels['États-Unis'], nameFr: 'États-Unis', offsetX: 0, offsetY: 0 },
+          { label: t.countryLabels['Canada'], nameFr: 'Canada', offsetX: -40, offsetY: 0 },
+          { label: t.countryLabels['Mexique'], nameFr: 'Mexique', offsetX: 0, offsetY: 0 },
+          { label: t.countryLabels['Groenland'], nameFr: 'Groenland', offsetX: 0, offsetY: 0 },
+          { label: t.countryLabels['Venezuela'], nameFr: 'Venezuela', offsetX: 10, offsetY: -10 },
+          { label: t.countryLabels['Colombie'], nameFr: 'Colombie', offsetX: 0, offsetY: 0 }
         ]
         
-        countryLabels.forEach(({ label, nameFr, offsetX, offsetY }) => {
+        countryLabels.forEach(({ nameFr, offsetX, offsetY }) => {
           const country = filteredFeatures.find(f => f.properties.NAME_FR === nameFr)
           if (country) {
             const centroid = d3.geoCentroid(country as any)
             const coords = p(centroid)
             if (coords) {
-              svg.selectAll(`.country-label-${label} text`)
+              svg.selectAll(`.country-label-${nameFr} text`)
                 .attr('x', coords[0] + offsetX)
                 .attr('y', coords[1] + offsetY)
             }
@@ -1267,21 +1255,21 @@ function App() {
 
   // Obtenir le titre et la source selon l'étape
   const getTitle = () => {
-    if (currentStep <= 1) return 'Les revendications des États-Unis'
-    if (currentStep === 2) return 'Le Technat'
-    return 'Economies de grands espaces (Großraumwirtschaften)'
+    if (currentStep <= 1) return t.mapTitles.step1
+    if (currentStep === 2) return t.mapTitles.step2
+    return t.mapTitles.step3
   }
 
   const getSubtitle = () => {
-    if (currentStep <= 1) return 'Donald Trump, 2025-2026'
-    if (currentStep === 2) return 'Howard Scott, 1940'
-    return 'Ferdinand Fried, 1940'
+    if (currentStep <= 1) return t.mapSubtitles.step1
+    if (currentStep === 2) return t.mapSubtitles.step2
+    return t.mapSubtitles.step3
   }
 
   const getSource = () => {
-    if (currentStep <= 1) return 'Donald Trump, X, 2025-2026'
-    if (currentStep === 2) return 'Howard Scott, 1940'
-    return 'Fried Ferdinand, Das XX. Jahrhundert, 1940'
+    if (currentStep <= 1) return t.sources.step1
+    if (currentStep === 2) return t.sources.step2
+    return t.sources.step3
   }
 
   return (
@@ -1346,6 +1334,64 @@ function App() {
           </Box>
         </Box>
 
+        {/* Language toggle - au-dessus du flou */}
+        <Box sx={{ 
+          position: 'absolute',
+          left: { xs: 8, sm: 12, md: 16 },
+          top: { xs: 50, sm: 46, md: 52 },
+          display: 'flex',
+          gap: 0,
+          alignItems: 'center',
+          borderRadius: '4px',
+          overflow: 'hidden',
+          border: '1px solid #ccc',
+          zIndex: 200,
+          pointerEvents: 'auto',
+        }}>
+          <Box
+            component="button"
+            onClick={() => setLanguage('fr')}
+            sx={{
+              px: { xs: 0.6, sm: 0.8, md: 1 },
+              py: { xs: 0.2, sm: 0.3 },
+              fontSize: { xs: '10px', sm: '11px', md: '12px' },
+              fontFamily: '"Open Sans", sans-serif',
+              fontWeight: language === 'fr' ? 700 : 400,
+              backgroundColor: language === 'fr' ? '#DD203C' : 'rgba(255,255,255,0.95)',
+              color: language === 'fr' ? '#fff' : '#666',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                backgroundColor: language === 'fr' ? '#DD203C' : 'rgba(0,0,0,0.05)',
+              },
+            }}
+          >
+            FR
+          </Box>
+          <Box
+            component="button"
+            onClick={() => setLanguage('es')}
+            sx={{
+              px: { xs: 0.6, sm: 0.8, md: 1 },
+              py: { xs: 0.2, sm: 0.3 },
+              fontSize: { xs: '10px', sm: '11px', md: '12px' },
+              fontFamily: '"Open Sans", sans-serif',
+              fontWeight: language === 'es' ? 700 : 400,
+              backgroundColor: language === 'es' ? '#DD203C' : 'rgba(255,255,255,0.95)',
+              color: language === 'es' ? '#fff' : '#666',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                backgroundColor: language === 'es' ? '#DD203C' : 'rgba(0,0,0,0.05)',
+              },
+            }}
+          >
+            ES
+          </Box>
+        </Box>
+
         {/* Map container */}
         <Box ref={mapContainerRef} sx={{ 
           width: '100%', 
@@ -1388,7 +1434,7 @@ function App() {
                 pointerEvents: 'none',
               }}
             >
-              Scrollez
+              {t.scrollPrompt}
               <KeyboardArrowDownIcon 
                 sx={{ 
                   fontSize: { xs: '16px', sm: '18px', md: '20px' },
@@ -1413,7 +1459,7 @@ function App() {
               transition: 'all 0.3s ease'
             }}
           >
-            Source: {getSource()}
+            {t.source}: {getSource()}
           </Box>
         </Box>
         
@@ -1445,7 +1491,7 @@ function App() {
           filter: `blur(${blurAmount}px)`,
           transition: 'filter 0.5s ease-out'
         }}>
-          <Legend showTechnat={showTechnat} showTrumpGolf={showTrumpGolf} />
+          <Legend showTechnat={showTechnat} showTrumpGolf={showTrumpGolf} legendTranslations={t.legend} />
         </Box>
       </Box>
 
@@ -1496,8 +1542,8 @@ function App() {
               color: '#1b1b1b',
               fontFamily: '"Open Sans", sans-serif',
             }}>
-              {stepTexts.intro.split('\n\n').map((para, i) => (
-                <Box key={i} sx={{ mb: i < stepTexts.intro.split('\n\n').length - 1 ? '11px' : 0 }}>
+              {t.stepTexts.intro.split('\n\n').map((para, i) => (
+                <Box key={i} sx={{ mb: i < t.stepTexts.intro.split('\n\n').length - 1 ? '11px' : 0 }}>
                   {para}
                 </Box>
               ))}
@@ -1512,7 +1558,7 @@ function App() {
               fontWeight: 600,
               fontSize: { xs: '15px', sm: '17px', md: '19px' },
             }}>
-              Scrollez pour explorer
+              {t.scrollToExplore}
               <KeyboardArrowDownIcon 
                 sx={{ 
                   fontSize: { xs: '28px', sm: '32px', md: '36px' },
@@ -1560,7 +1606,7 @@ function App() {
               mb: 2,
               color: '#DD203C'
             }}>
-              Les revendications de Trump
+              {t.slideTitles.trumpClaims}
             </Box>
             <Box sx={{
               fontSize: { xs: '14px', sm: '16px', md: '18px' },
@@ -1568,8 +1614,8 @@ function App() {
               color: '#1b1b1b',
               fontFamily: '"Open Sans", sans-serif',
             }}>
-              {stepTexts.step1.split('\n\n').map((para, i) => (
-                <Box key={i} sx={{ mb: i < stepTexts.step1.split('\n\n').length - 1 ? '11px' : 0 }}>
+              {t.stepTexts.step1.split('\n\n').map((para, i) => (
+                <Box key={i} sx={{ mb: i < t.stepTexts.step1.split('\n\n').length - 1 ? '11px' : 0 }}>
                   {para}
                 </Box>
               ))}
@@ -1653,7 +1699,7 @@ function App() {
               mb: 2,
               color: '#DD203C'
             }}>
-              Le Technat
+              {t.slideTitles.technat}
             </Box>
             <Box sx={{
               fontSize: { xs: '14px', sm: '16px', md: '18px' },
@@ -1661,8 +1707,8 @@ function App() {
               color: '#1b1b1b',
               fontFamily: '"Open Sans", sans-serif',
             }}>
-              {stepTexts.step2.split('\n\n').map((para, i) => (
-                <Box key={i} sx={{ mb: i < stepTexts.step2.split('\n\n').length - 1 ? '11px' : 0 }}>
+              {t.stepTexts.step2.split('\n\n').map((para, i) => (
+                <Box key={i} sx={{ mb: i < t.stepTexts.step2.split('\n\n').length - 1 ? '11px' : 0 }}>
                   {para}
                 </Box>
               ))}
@@ -1746,7 +1792,7 @@ function App() {
               mb: 2,
               color: '#DD203C'
             }}>
-              Les économies de grands espaces
+              {t.slideTitles.grandEspaces}
             </Box>
             <Box sx={{
               fontSize: { xs: '14px', sm: '16px', md: '18px' },
@@ -1754,8 +1800,8 @@ function App() {
               color: '#1b1b1b',
               fontFamily: '"Open Sans", sans-serif',
             }}>
-              {stepTexts.step3.split('\n\n').map((para, i) => (
-                <Box key={i} sx={{ mb: i < stepTexts.step3.split('\n\n').length - 1 ? '11px' : 0 }}>
+              {t.stepTexts.step3.split('\n\n').map((para, i) => (
+                <Box key={i} sx={{ mb: i < t.stepTexts.step3.split('\n\n').length - 1 ? '11px' : 0 }}>
                   {para}
                 </Box>
               ))}

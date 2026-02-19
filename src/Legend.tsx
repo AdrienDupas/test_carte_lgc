@@ -1,11 +1,13 @@
 import { Box, Fade } from '@mui/material'
+import type { Translations } from './constants/translations'
 
 interface LegendProps {
   showTechnat: boolean
   showTrumpGolf: boolean
+  legendTranslations: Translations['legend']
 }
 
-function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
+function Legend({ showTechnat, showTrumpGolf, legendTranslations: lt }: LegendProps) {
   // (paysItem removed: unused variable)
 
   // Étape 1: Economies de grands espaces
@@ -129,7 +131,7 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
         </svg>
       </Box>
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Frontières de 1939
+        {lt.borders1939}
       </Box>
     </Box>
   ]
@@ -153,7 +155,7 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
         flexShrink: 0
       }} />
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Technat
+        {lt.technat}
       </Box>
     </Box>,
     <Box 
@@ -174,7 +176,7 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
         flexShrink: 0
       }} />
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Réseaux de bases de défense
+        {lt.defenseNetworks}
       </Box>
     </Box>,
     <Box 
@@ -196,7 +198,7 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
         flexShrink: 0
       }} />
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Bases militaires du Technat
+        {lt.technatBases}
       </Box>
     </Box>,
     <Box 
@@ -217,7 +219,7 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
         flexShrink: 0
       }} />
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Frontières maritimes du Technat
+        {lt.technatMaritimeBorders}
       </Box>
     </Box>,
     <Box 
@@ -256,7 +258,7 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
         </svg>
       </Box>
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Frontières de 1939
+        {lt.borders1939}
       </Box>
     </Box>
   ]
@@ -281,7 +283,7 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
         flexShrink: 0
       }} />
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Revendications de Donald Trump
+        {lt.trumpClaims}
       </Box>
     </Box>,
     <Box 
@@ -301,7 +303,7 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
         flexShrink: 0
       }} />
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Revendication non officielle
+        {lt.unofficialClaim}
       </Box>
     </Box>,
     <Box 
@@ -323,7 +325,7 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
         flexShrink: 0
       }} />
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Bases militaires états-uniennes actuelles
+        {lt.usCurrentBases}
       </Box>
     </Box>,
     <Box 
@@ -362,7 +364,7 @@ function Legend({ showTechnat, showTrumpGolf }: LegendProps) {
         </svg>
       </Box>
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Frontières actuelles
+        {lt.currentBorders}
       </Box>
     </Box>
   ]
