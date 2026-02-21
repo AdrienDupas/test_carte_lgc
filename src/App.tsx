@@ -252,12 +252,25 @@ function App() {
       }
     }
 
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  📱 SMARTPHONE SCROLL LOCK — Blocage touch natif                ║
+    // ║  Bloque les touchmove natifs quand le parent contrôle le        ║
+    // ║  scroll (empêche le double-scroll sur iOS / Android).           ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+    const blockNativeTouch = (e: TouchEvent) => {
+      if (parentControllingRef.current) {
+        e.preventDefault()
+      }
+    }
+
     window.addEventListener('message', handleParentMessage)
     window.addEventListener('wheel', blockNativeWheel, { passive: false })
+    window.addEventListener('touchmove', blockNativeTouch, { passive: false })
 
     return () => {
       window.removeEventListener('message', handleParentMessage)
       window.removeEventListener('wheel', blockNativeWheel)
+      window.removeEventListener('touchmove', blockNativeTouch)
       if (controlTimeout) clearTimeout(controlTimeout)
     }
   }, [])
@@ -290,10 +303,54 @@ function App() {
       }
     }
 
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  📱 SMARTPHONE SCROLL LOCK — Détection boundaries au touch     ║
+    // ║  Quand l'app React atteint le haut ou le bas via un geste      ║
+    // ║  tactile, envoie iframeBoundaryWheel au parent pour qu'il      ║
+    // ║  relâche le capture et reprenne le scroll de la page.          ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+    let touchLastY: number | null = null
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        touchLastY = e.touches[0].clientY
+      }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length !== 1 || touchLastY === null) return
+      if (parentControllingRef.current) return
+
+      const currentY = e.touches[0].clientY
+      const deltaY = touchLastY - currentY // positif = scroll vers le bas
+      touchLastY = currentY
+
+      const { scrollTop, scrollHeight, clientHeight } = container
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 2
+      const atTop = scrollTop <= 0
+
+      if ((deltaY > 0 && atBottom) || (deltaY < 0 && atTop)) {
+        window.parent.postMessage(
+          { type: 'iframeBoundaryWheel', deltaY },
+          '*'
+        )
+      }
+    }
+
+    const handleTouchEnd = () => {
+      touchLastY = null
+    }
+
     window.addEventListener('wheel', handleBoundaryWheel, { passive: true })
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    window.addEventListener('touchmove', handleTouchMove, { passive: true })
+    window.addEventListener('touchend', handleTouchEnd, { passive: true })
 
     return () => {
       window.removeEventListener('wheel', handleBoundaryWheel)
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchend', handleTouchEnd)
     }
   }, [])
 
