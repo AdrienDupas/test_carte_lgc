@@ -188,6 +188,66 @@ Esta obsesión por la grandeza territorial asociada a la prosperidad y al poder 
       currentBorders: 'Fronteras actuales',
     }
   }
-} as const
+}
 
-export type Translations = typeof translations['fr']
+export type Translations = {
+  stepTexts: {
+    intro: string
+    step1: string
+    step2: string
+    step3: string
+  }
+  slideTitles: {
+    trumpClaims: string
+    technat: string
+    grandEspaces: string
+  }
+  mapTitles: {
+    step1: string
+    step2: string
+    step3: string
+  }
+  mapSubtitles: {
+    step1: string
+    step2: string
+    step3: string
+  }
+  sources: {
+    step1: string
+    step2: string
+    step3: string
+  }
+  scrollPrompt: string
+  scrollToExplore: string
+  source: string
+  countryLabels: {
+    'États-Unis': string
+    'Canada': string
+    'Groenland': string
+    'Venezuela': string
+    'Mexique': string
+    'Colombie': string
+  }
+  canalDePanama: string
+  oceans: {
+    pacific: string
+    atlantic: string
+    indian: string
+    arctic: string
+  }
+  legend: {
+    dominantPoles: string
+    extractionZones: string
+    peripheralRegions: string
+    fourEconomicAreas: string
+    borders1939: string
+    technat: string
+    defenseNetworks: string
+    technatBases: string
+    technatMaritimeBorders: string
+    trumpClaims: string
+    unofficialClaim: string
+    usCurrentBases: string
+    currentBorders: string
+  }
+}
