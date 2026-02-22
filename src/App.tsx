@@ -1404,10 +1404,13 @@ function App() {
           border: '1px solid #ccc',
           zIndex: 200,
           pointerEvents: 'auto',
+          // Fix iOS Safari : -webkit-tap-highlight-color pour réactivité tactile
+          WebkitTapHighlightColor: 'rgba(0,0,0,0.1)',
         }}>
           <Box
             component="button"
             onClick={() => setLanguage('fr')}
+            onTouchEnd={(e: React.TouchEvent) => { e.preventDefault(); setLanguage('fr'); }}
             sx={{
               px: { xs: 0.6, sm: 0.8, md: 1 },
               py: { xs: 0.2, sm: 0.3 },
@@ -1419,6 +1422,12 @@ function App() {
               border: 'none',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
+              // Garantir la zone de touch minimale sur mobile
+              minWidth: '36px',
+              minHeight: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               '&:hover': {
                 backgroundColor: language === 'fr' ? '#DD203C' : 'rgba(0,0,0,0.05)',
               },
@@ -1429,6 +1438,7 @@ function App() {
           <Box
             component="button"
             onClick={() => setLanguage('es')}
+            onTouchEnd={(e: React.TouchEvent) => { e.preventDefault(); setLanguage('es'); }}
             sx={{
               px: { xs: 0.6, sm: 0.8, md: 1 },
               py: { xs: 0.2, sm: 0.3 },
@@ -1440,6 +1450,11 @@ function App() {
               border: 'none',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
+              minWidth: '36px',
+              minHeight: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               '&:hover': {
                 backgroundColor: language === 'es' ? '#DD203C' : 'rgba(0,0,0,0.05)',
               },
@@ -1581,6 +1596,10 @@ function App() {
               borderRadius: 2,
               opacity: activeSection === 0 ? 1 : 0.3,
               transition: 'opacity 0.5s ease',
+              WebkitBackfaceVisibility: 'hidden',
+              backfaceVisibility: 'hidden',
+              WebkitTransform: 'translateZ(0)',
+              transform: 'translateZ(0)',
               pointerEvents: 'auto',
             }}
           >
@@ -1653,6 +1672,10 @@ function App() {
               borderRadius: 2,
               opacity: activeSection === 1 ? 1 : 0.3,
               transition: 'opacity 0.5s ease',
+              WebkitBackfaceVisibility: 'hidden',
+              backfaceVisibility: 'hidden',
+              WebkitTransform: 'translateZ(0)',
+              transform: 'translateZ(0)',
               pointerEvents: 'auto',
             }}
           >
@@ -1713,6 +1736,10 @@ function App() {
               boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
               opacity: activeSection === 2 ? 1 : 0,
               transition: 'opacity 0.5s ease',
+              WebkitBackfaceVisibility: 'hidden',
+              backfaceVisibility: 'hidden',
+              WebkitTransform: 'translateZ(0)',
+              transform: 'translateZ(0)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -1746,6 +1773,10 @@ function App() {
               borderRadius: 2,
               opacity: activeSection === 3 ? 1 : 0.3,
               transition: 'opacity 0.5s ease',
+              WebkitBackfaceVisibility: 'hidden',
+              backfaceVisibility: 'hidden',
+              WebkitTransform: 'translateZ(0)',
+              transform: 'translateZ(0)',
               pointerEvents: 'auto',
             }}
           >
@@ -1806,6 +1837,10 @@ function App() {
               boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
               opacity: activeSection === 4 ? 1 : 0,
               transition: 'opacity 0.5s ease',
+              WebkitBackfaceVisibility: 'hidden',
+              backfaceVisibility: 'hidden',
+              WebkitTransform: 'translateZ(0)',
+              transform: 'translateZ(0)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -1839,6 +1874,10 @@ function App() {
               borderRadius: 2,
               opacity: activeSection === 5 ? 1 : 0.3,
               transition: 'opacity 0.5s ease',
+              WebkitBackfaceVisibility: 'hidden',
+              backfaceVisibility: 'hidden',
+              WebkitTransform: 'translateZ(0)',
+              transform: 'translateZ(0)',
               pointerEvents: 'auto',
             }}
           >
