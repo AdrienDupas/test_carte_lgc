@@ -30,7 +30,7 @@ function Legend({ showTechnat, showTrumpGolf, legendTranslations: lt }: LegendPr
         flexShrink: 0
       }} />
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Pôles économiques dominants
+        {lt.dominantPoles}
       </Box>
     </Box>,
     <Box 
@@ -51,7 +51,7 @@ function Legend({ showTechnat, showTrumpGolf, legendTranslations: lt }: LegendPr
         flexShrink: 0
       }} />
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Zones d’extraction des ressources
+        {lt.extractionZones}
       </Box>
     </Box>,
     <Box 
@@ -71,7 +71,7 @@ function Legend({ showTechnat, showTrumpGolf, legendTranslations: lt }: LegendPr
         flexShrink: 0
       }} />
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Régions périphériques
+        {lt.peripheralRegions}
       </Box>
     </Box>,
     <Box 
@@ -92,7 +92,7 @@ function Legend({ showTechnat, showTrumpGolf, legendTranslations: lt }: LegendPr
         flexShrink: 0
       }} />
       <Box sx={{ fontSize: { xs: 11, md: 14 }, opacity: 1 }}>
-        Quatre aires économiques
+        {lt.fourEconomicAreas}
       </Box>
     </Box>,
     <Box 
